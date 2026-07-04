@@ -1,0 +1,88 @@
+// Collaborative document editor — PostgreSQL schema
+// See AGENTS.md for architecture constraints (CRDT snapshots, role enforcement).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DocumentRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum SnapshotKind {
+  MANUAL
+  AUTO
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String   @map("password_hash")
+  image        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  ownedDocuments Document[]             @relation("DocumentOwner")
+  collaborations DocumentCollaborator[]
+  snapshots      DocumentSnapshot[]     @relation("SnapshotAuthor")
+
+  @@map("users")
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String
+  ownerId   String   @map("owner_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner          User                   @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  collaborators  DocumentCollaborator[]
+  snapshots      DocumentSnapshot[]
+
+  @@index([ownerId])
+  @@index([updatedAt(sort: Desc)])
+  @@map("documents")
+}
+
+model DocumentCollaborator {
+  id         String       @id @default(cuid())
+  documentId String       @map("document_id")
+  userId     String       @map("user_id")
+  role       DocumentRole
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+  @@index([userId])
+  @@index([documentId])
+  @@map("document_collaborators")
+}
+
+model DocumentSnapshot {
+  id          String       @id @default(cuid())
+  documentId  String       @map("document_id")
+  yjsState    Bytes        @map("yjs_state")
+  kind        SnapshotKind @default(AUTO)
+  label          String?
+  changeSummary  String?      @map("change_summary")
+  createdById    String?      @map("created_by_id")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdBy User?    @relation("SnapshotAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([documentId, createdAt(sort: Desc)])
+  @@map("document_snapshots")
+}
