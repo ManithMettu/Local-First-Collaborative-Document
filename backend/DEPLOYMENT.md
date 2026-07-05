@@ -97,7 +97,7 @@ Redeploy Vercel after changing `NEXT_PUBLIC_WS_URL` (baked into the client bundl
 
 Every push to your connected branch:
 
-1. Railway runs `npm ci && npm run build` (TypeScript → `dist/`).
+1. Railway runs `npm ci` (Nixpacks install phase) then `npm run build` (TypeScript → `dist/`).
 2. Starts with `node dist/index.js`.
 3. Health check hits `/` until the server responds.
 
