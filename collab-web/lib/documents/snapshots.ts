@@ -1,3 +1,5 @@
+import * as Y from "yjs";
+
 import { db } from "@/lib/db";
 import { extractTextFromYjsState } from "@/lib/yjs/preview";
 import { fetchServerDocumentState } from "@/lib/ws/internal";
