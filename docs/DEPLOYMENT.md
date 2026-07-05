@@ -92,9 +92,10 @@ curl https://<your-ws-host>/
 ## 2. Next.js app (Vercel)
 
 1. Import the GitHub repo in Vercel.
-2. Set **Root Directory** to `collab-web`.
-3. Framework preset: **Next.js**.
-4. Build runs `prisma generate` via `postinstall` and `next build` via the default build command.
+2. Set **Root Directory** to `collab-web` (required — the app is not at the repo root).
+3. Framework preset: **Next.js** (also enforced by `collab-web/vercel.json`).
+4. Leave **Output Directory** empty (Next.js manages `.next` automatically).
+5. Build runs `prisma generate` via `postinstall` and `next build` via the default build command.
 
 ### Vercel environment variables
 
