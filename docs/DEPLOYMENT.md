@@ -40,11 +40,12 @@ Deploy from the **`backend/`** directory (separate `package.json`).
 ### Railway
 
 1. New project → **Deploy from GitHub** → select this repo.
-2. Set **Root Directory** to `backend`.
-3. Build command: `npm install && npm run build`
-4. Start command: `npm start`
-5. Add a **public domain** (e.g. `collab-ws.up.railway.app`).
-6. Set environment variables (see table below).
+2. Set **Root Directory** to `backend` (required).
+3. Railway auto-loads `backend/railway.toml` and `backend/nixpacks.toml` (Node 22, `npm ci`, health check on `/`).
+4. **Networking → Generate Domain** (e.g. `collab-ws.up.railway.app`).
+5. Set environment variables (see table below).
+
+Full walkthrough: [backend/DEPLOYMENT.md](../backend/DEPLOYMENT.md).
 
 Railway injects `PORT` automatically; the server binds to `0.0.0.0`.
 
@@ -63,7 +64,7 @@ Railway injects `PORT` automatically; the server binds to `0.0.0.0`.
 | `DATABASE_URL` | ✓ | Same Postgres as Next.js |
 | `NEXTAUTH_SECRET` | ✓ | **Must match** Vercel exactly |
 | `WS_INTERNAL_SECRET` | ✓ | **Must match** Vercel exactly |
-| `NEXT_APP_URL` | ✓ | Vercel production URL, e.g. `https://your-app.vercel.app` (AUTO snapshot AI summaries) |
+| `NEXT_APP_URL` | ✓ | `https://collab-one-phi.vercel.app` (AUTO snapshot AI summaries) |
 | `PORT` | — | Set by host (Railway/Render) |
 | `HOST` | — | Default `0.0.0.0` |
 | `MAX_MESSAGE_BYTES` | — | Default `1048576` |
@@ -75,15 +76,15 @@ Railway injects `PORT` automatically; the server binds to `0.0.0.0`.
 Browsers connect with y-websocket:
 
 ```
-wss://<your-ws-host>/<documentId>?token=<session-token>
+wss://local-first-collaborative-document-production-9bed.up.railway.app/<documentId>?token=<session-token>
 ```
 
-Use the **public HTTPS/WSS hostname** from Railway or Render (not an internal URL).
+Use the **public HTTPS/WSS hostname** from Railway (not an internal URL).
 
 Verify:
 
 ```bash
-curl https://<your-ws-host>/
+curl https://local-first-collaborative-document-production-9bed.up.railway.app/
 # → Collab WebSocket server
 ```
 
@@ -103,9 +104,9 @@ curl https://<your-ws-host>/
 |----------|----------|-------|
 | `DATABASE_URL` | ✓ | Production Postgres connection string |
 | `NEXTAUTH_SECRET` | ✓ | Same as WS server |
-| `NEXTAUTH_URL` | ✓ | `https://your-app.vercel.app` |
-| `NEXT_PUBLIC_WS_URL` | ✓ | `wss://<your-ws-host>` (no path) |
-| `WS_SERVER_HTTP_URL` | ✓ | `https://<your-ws-host>` (internal HTTP from Vercel → WS server) |
+| `NEXTAUTH_URL` | ✓ | `https://collab-one-phi.vercel.app` |
+| `NEXT_PUBLIC_WS_URL` | ✓ | `wss://local-first-collaborative-document-production-9bed.up.railway.app` |
+| `WS_SERVER_HTTP_URL` | ✓ | `https://local-first-collaborative-document-production-9bed.up.railway.app` |
 | `WS_INTERNAL_SECRET` | ✓ | Same as WS server |
 | `GROQ_API_KEY` | — | Optional; AI version summaries |
 | `GROQ_MODEL` | — | Default `llama-3.1-8b-instant` |

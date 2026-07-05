@@ -1,0 +1,14 @@
+# Nixpacks config — used by Railway during build.
+# https://nixpacks.com/docs/configuration/file
+
+[variables]
+NODE_VERSION = "22"
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start"

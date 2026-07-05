@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { config } from "../config.js";
 import { createPgPool } from "./pool.js";
 
@@ -59,7 +61,7 @@ export async function createAutoSnapshot(
   documentId: string,
   state: Uint8Array,
 ): Promise<string> {
-  const snapshotId = crypto.randomUUID();
+  const snapshotId = randomUUID();
 
   await pool.query(
     `INSERT INTO document_snapshots (id, document_id, yjs_state, kind, created_at)

@@ -54,9 +54,16 @@ export class DocumentPersistence {
       return;
     }
 
-    const snapshotId = await createAutoSnapshot(documentId, state);
-    this.lastSavedHash.set(documentId, stateHash);
-    void requestSnapshotSummary(documentId, snapshotId);
+    try {
+      const snapshotId = await createAutoSnapshot(documentId, state);
+      this.lastSavedHash.set(documentId, stateHash);
+      void requestSnapshotSummary(documentId, snapshotId);
+    } catch (error) {
+      console.error(
+        `[persistence] Failed to save snapshot for document ${documentId}:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
   }
 
   async flushAll(docs: Map<string, Y.Doc>): Promise<void> {

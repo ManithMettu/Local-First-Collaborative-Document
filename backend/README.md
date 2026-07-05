@@ -57,7 +57,16 @@ The Next.js app runs on port **3000** — keep both running for live sync in Pha
 
 ## Deploy to production
 
-See the root [Deployment guide](../docs/DEPLOYMENT.md) (Vercel + Railway/Render).
+**Railway (recommended):** step-by-step guide in [DEPLOYMENT.md](./DEPLOYMENT.md).
+
+Quick checklist:
+
+1. Railway project → Root Directory **`backend`**
+2. Generate a **public domain**
+3. Set env vars (`DATABASE_URL`, `NEXTAUTH_SECRET`, `WS_INTERNAL_SECRET`, `NEXT_APP_URL`)
+4. Point Vercel at `wss://<railway-domain>` via `NEXT_PUBLIC_WS_URL`
+
+Also see the root [Deployment guide](../docs/DEPLOYMENT.md) (Vercel + Railway).
 
 ## Scripts
 
