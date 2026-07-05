@@ -27,29 +27,29 @@ function LinkedInIcon({ className }: { className?: string }) {
 export function SiteFooter() {
   return (
     <footer className="mt-auto shrink-0 border-t border-border bg-card/80">
-      <div className="mx-auto flex w-[90%] max-w-none flex-col gap-3 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex w-[90%] max-w-none flex-col gap-2 py-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {new Date().getFullYear()}{" "}
           <span className="text-foreground">Mettu Manith</span> — Collab
         </p>
-        <nav aria-label="Footer" className="flex items-center gap-3">
+        <nav aria-label="Footer" className="flex items-center gap-2">
           <a
             href="https://github.com/ManithMettu"
-            className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground"
+            className="inline-flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground"
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub profile"
           >
-            <GitHubIcon className="size-4" />
+            <GitHubIcon className="size-3.5" />
           </a>
           <a
             href="https://www.linkedin.com/in/manith-mettu-21a905259/"
-            className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground"
+            className="inline-flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground"
             target="_blank"
             rel="noreferrer"
             aria-label="LinkedIn profile"
           >
-            <LinkedInIcon className="size-4" />
+            <LinkedInIcon className="size-3.5" />
           </a>
         </nav>
       </div>

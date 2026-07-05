@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/auth/password-input";
 import { Label } from "@/components/ui/label";
 
 const authInputClassName = "h-11 px-3 py-3 text-base md:text-base";
@@ -90,17 +91,16 @@ export function RegisterForm() {
 
       <div className="space-y-2">
         <Label htmlFor="password" className={authLabelClassName}>Password</Label>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="new-password"
           required
           minLength={8}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="At least 8 characters"
-          className={authInputClassName}
+          inputClassName={authInputClassName}
         />
       </div>
 
