@@ -129,9 +129,40 @@ Set `WS_SERVER_HTTP_URL` in the Next.js app (e.g. `http://localhost:1234`) and t
 
 Full production guide: [DEPLOYMENT.md](./DEPLOYMENT.md).
 
+## Security
+
+### WebSocket hardening
+
+- **Payload size cap** — `MAX_MESSAGE_BYTES` (default 1 MB) rejects oversized frames before parsing.
+- **Rate limiting** — per-connection token bucket (`MAX_MESSAGES_PER_SECOND`, default 50); sustained abuse triggers disconnect.
+- **Malformed updates** — `Y.applyUpdate` runs in try/catch; repeated failures close the connection (`MAX_MALFORMED_MESSAGES`).
+- **Auth at handshake** — NextAuth JWT verified on upgrade; document role loaded from Postgres before joining a room.
+
+### API and data isolation
+
+- **ORM scoping** — every document query filters by `ownerId` or `collaborators.some.userId`; snapshots are always fetched with `{ id, documentId }`.
+- **Role gates** — `requireDocumentAccess` / `requireDocumentOwner` on all mutating REST routes; viewers need `VIEWER` minimum for read, `EDITOR` for writes/restores.
+- **Internal routes** — `WS_INTERNAL_SECRET` bearer token on `/internal/*`; request bodies are size-capped on the WS HTTP listener.
+- **Viewer write block** — read-only connections cannot send Yjs sync step 2 or update messages (close code `4403`); UI sets `contenteditable={false}`.
+
+### OOM and abuse mitigation
+
+| Threat | Mitigation |
+|--------|------------|
+| Huge sync payload | Byte limit on WS frames + base64 decode size check on internal `apply-update` |
+| Flood of messages | Per-connection rate limiter with auto-disconnect |
+| Corrupt CRDT bytes | Malformed-update tracker; invalid updates never crash the process |
+| Cross-tenant access | Prisma queries scoped to authenticated user; WS handshake re-checks role |
+| Role change while connected | `disconnect-user` internal API forces reconnect with fresh role |
+
+### Restore without an active room
+
+If nobody has the document open, `POST .../restore` still returns the mergeable Yjs update to the client **and** persists the merged state as a manual snapshot in PostgreSQL so the next session hydrates correctly.
+
 ## Testing
 
 See [`tests/README.md`](../tests/README.md).
 
 - **Vitest** — CRDT merge determinism, non-destructive restore, offline-reconnect simulation (no DB).
-- **Playwright** — two-browser-context live sync and offline/reconnect against real app + WS server (requires PostgreSQL).
+- **Playwright** — two-browser-context live sync, offline/reconnect, and viewer write-blocking (requires PostgreSQL).
+- **Backend Vitest** — WebSocket payload validation and rate limiter unit tests in `backend/`.

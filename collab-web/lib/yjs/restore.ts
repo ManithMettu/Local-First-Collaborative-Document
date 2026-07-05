@@ -116,3 +116,17 @@ export function decodeStateBase64(encoded: string): Uint8Array {
   }
   return bytes;
 }
+
+export function mergeDocumentState(
+  currentState: Uint8Array,
+  restoreUpdate: Uint8Array,
+): Uint8Array {
+  const doc = new Y.Doc();
+  try {
+    Y.applyUpdate(doc, currentState);
+    Y.applyUpdate(doc, restoreUpdate);
+    return Y.encodeStateAsUpdate(doc);
+  } finally {
+    doc.destroy();
+  }
+}

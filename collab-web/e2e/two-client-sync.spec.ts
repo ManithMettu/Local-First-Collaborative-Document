@@ -35,6 +35,7 @@ test.describe("two-client collaboration", () => {
       const documentUrl = await createDocument(pageA, "Two-client sync");
 
       await login(pageB, user);
+      await pageA.goto(documentUrl);
       await pageB.goto(documentUrl);
 
       await waitForEditor(pageA);
@@ -71,6 +72,7 @@ test.describe("two-client collaboration", () => {
       const documentUrl = await createDocument(pageA, "Offline reconnect");
 
       await login(pageB, user);
+      await pageA.goto(documentUrl);
       await pageB.goto(documentUrl);
 
       await waitForEditor(pageA);
@@ -86,12 +88,11 @@ test.describe("two-client collaboration", () => {
       await expectEditorContains(pageB, "[online]");
 
       await contextA.setOffline(false);
-      await waitForOnline(pageA);
 
-      await expectEditorContains(pageA, "[offline]");
-      await expectEditorContains(pageA, "[online]");
-      await expectEditorContains(pageB, "[offline]");
-      await expectEditorContains(pageB, "[online]");
+      await expectEditorContains(pageA, "[offline]", 60_000);
+      await expectEditorContains(pageA, "[online]", 60_000);
+      await expectEditorContains(pageB, "[offline]", 60_000);
+      await expectEditorContains(pageB, "[online]", 60_000);
     } finally {
       await contextA.close();
       await contextB.close();

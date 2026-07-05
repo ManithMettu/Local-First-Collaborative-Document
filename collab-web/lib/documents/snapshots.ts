@@ -1,8 +1,23 @@
-import * as Y from "yjs";
-
 import { db } from "@/lib/db";
 import { extractTextFromYjsState } from "@/lib/yjs/preview";
 import { fetchServerDocumentState } from "@/lib/ws/internal";
+
+export async function persistDocumentStateAsSnapshot(
+  documentId: string,
+  state: Uint8Array,
+  userId: string,
+  label = "Restored version",
+): Promise<void> {
+  await db.documentSnapshot.create({
+    data: {
+      documentId,
+      yjsState: Buffer.from(state),
+      kind: "MANUAL",
+      label,
+      createdById: userId,
+    },
+  });
+}
 
 export async function resolveLiveDocumentState(
   documentId: string,

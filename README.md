@@ -110,8 +110,8 @@ Full step-by-step guide: **[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)**.
 ---
 
 <p align="center">
-  Built by <strong>Your Name</strong><br />
-  <a href="https://github.com/your-username">GitHub</a>
+  Built by <strong>Mettu Manith</strong><br />
+  <a href="https://github.com/ManithMettu">GitHub</a>
   ·
-  <a href="https://linkedin.com/in/your-profile">LinkedIn</a>
+  <a href="https://www.linkedin.com/in/manith-mettu-21a905259/">LinkedIn</a>
 </p>

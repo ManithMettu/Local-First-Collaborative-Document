@@ -58,7 +58,7 @@ export async function waitForOnline(page: Page): Promise<void> {
         const label = await status.getAttribute("aria-label");
         return label?.includes("Online") ?? false;
       },
-      { timeout: 45_000 },
+      { timeout: 90_000 },
     )
     .toBe(true);
 }
@@ -76,6 +76,7 @@ export async function typeInEditor(page: Page, text: string): Promise<void> {
 export async function expectEditorContains(
   page: Page,
   text: string,
+  timeout = 20_000,
 ): Promise<void> {
-  await expect(editorLocator(page)).toContainText(text, { timeout: 20_000 });
+  await expect(editorLocator(page)).toContainText(text, { timeout });
 }

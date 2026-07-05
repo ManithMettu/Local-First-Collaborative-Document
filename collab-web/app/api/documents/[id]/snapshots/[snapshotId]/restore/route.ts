@@ -7,11 +7,13 @@ import {
 } from "@/lib/documents/access";
 import {
   getSnapshotState,
+  persistDocumentStateAsSnapshot,
   resolveLiveDocumentState,
 } from "@/lib/documents/snapshots";
 import {
   computeRestoreUpdate,
   encodeStateBase64,
+  mergeDocumentState,
 } from "@/lib/yjs/restore";
 import { applyServerDocumentUpdate } from "@/lib/ws/internal";
 import type { DocumentSnapshotRestoreRouteContext } from "@/types/api";
@@ -47,11 +49,24 @@ export async function POST(_request: Request, context: DocumentSnapshotRestoreRo
       });
     }
 
-    await applyServerDocumentUpdate(documentId, restoreUpdate);
+    const mergedState = mergeDocumentState(currentState, restoreUpdate);
+    const appliedToRoom = await applyServerDocumentUpdate(
+      documentId,
+      restoreUpdate,
+    );
+
+    if (!appliedToRoom) {
+      await persistDocumentStateAsSnapshot(
+        documentId,
+        mergedState,
+        userId,
+      );
+    }
 
     return NextResponse.json({
       applied: true,
       update: encodeStateBase64(restoreUpdate),
+      persistedToDatabase: !appliedToRoom,
     });
   } catch {
     return serverError();

@@ -1,4 +1,4 @@
-import pg from "pg";
+import { createPgPool } from "../lib/pg-pool";
 
 let cachedAvailability: boolean | null = null;
 
@@ -13,7 +13,7 @@ export async function isDatabaseAvailable(): Promise<boolean> {
     return false;
   }
 
-  const pool = new pg.Pool({ connectionString });
+  const pool = createPgPool(connectionString);
 
   try {
     await pool.query("SELECT 1");

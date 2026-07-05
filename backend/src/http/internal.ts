@@ -30,11 +30,21 @@ function isAuthorized(request: IncomingMessage): boolean {
   return scheme?.toLowerCase() === "bearer" && token === config.internalApiSecret;
 }
 
-function readBody(request: IncomingMessage): Promise<string> {
+function readBody(
+  request: IncomingMessage,
+  maxBytes = config.maxMessageBytes,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
+    let totalBytes = 0;
 
     request.on("data", (chunk: Buffer) => {
+      totalBytes += chunk.byteLength;
+      if (totalBytes > maxBytes) {
+        reject(new Error("BODY_TOO_LARGE"));
+        request.destroy();
+        return;
+      }
       chunks.push(chunk);
     });
 
@@ -101,6 +111,11 @@ export async function handleInternalRequest(
       }
 
       const update = new Uint8Array(Buffer.from(payload.update, "base64"));
+      if (update.byteLength > config.maxMessageBytes) {
+        sendJson(response, 413, { error: "Update payload too large" });
+        return true;
+      }
+
       const applied = applyUpdateToRoom(documentId, update);
 
       if (!applied) {
@@ -110,7 +125,11 @@ export async function handleInternalRequest(
 
       sendJson(response, 200, { applied: true });
       return true;
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === "BODY_TOO_LARGE") {
+        sendJson(response, 413, { error: "Request body too large" });
+        return true;
+      }
       sendJson(response, 400, { error: "Invalid request body" });
       return true;
     }
@@ -142,7 +161,11 @@ export async function handleInternalRequest(
 
       sendJson(response, 200, { disconnected });
       return true;
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === "BODY_TOO_LARGE") {
+        sendJson(response, 413, { error: "Request body too large" });
+        return true;
+      }
       sendJson(response, 400, { error: "Invalid request body" });
       return true;
     }
