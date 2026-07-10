@@ -1,18 +1,63 @@
-# Deploy backend to Railway
+# Deploy backend (WebSocket server)
 
-The WebSocket sync server must run as a **long-lived Node process** (not serverless). Railway is the recommended host for `backend/`.
+The WebSocket sync server must run as a **long-lived Node process** (not serverless).
 
-Config files in this folder:
-
-| File | Purpose |
-|------|---------|
-| `railway.toml` | Build, health check, restart policy |
-| `nixpacks.toml` | Node 22 + install/build/start commands |
-| `.railwayignore` | Excludes local artifacts from upload |
+| Platform | Config |
+|----------|--------|
+| **Render** (recommended) | Repo root [`render.yaml`](../render.yaml) or settings below |
+| **Railway** | [`railway.toml`](./railway.toml), [`nixpacks.toml`](./nixpacks.toml) |
 
 ---
 
-## 1. Create the Railway service
+## Render
+
+### Option A — Blueprint (easiest)
+
+1. [Render](https://render.com) → **New** → **Blueprint** → connect this GitHub repo.
+2. Render reads [`render.yaml`](../render.yaml) at the repo root (service `collab-ws-server`, `rootDir: backend`).
+3. Add environment variables in the Render dashboard (see table below).
+4. **Create Web Service** → note the public URL (`https://….onrender.com`).
+
+### Option B — Manual Web Service
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | `backend` |
+| **Build Command** | `npm ci --include=dev && npm run build` |
+| **Start Command** | `npm start` |
+| **Health Check Path** | `/` |
+
+> **Why `--include=dev`?** TypeScript is a devDependency. Render sets `NODE_ENV=production` during build, which skips devDependencies by default — so `tsc` never runs and `dist/index.js` is missing at start.
+
+Verify after deploy:
+
+```bash
+curl https://<your-render-domain>/
+# → Collab WebSocket server
+```
+
+WebSocket URL for browsers:
+
+```
+wss://<your-render-domain>/<documentId>?token=<session-token>
+```
+
+### Render environment variables
+
+| Variable | Required | Example |
+|----------|----------|---------|
+| `DATABASE_URL` | ✓ | Same PostgreSQL URL as `collab-web` |
+| `NEXTAUTH_SECRET` | ✓ | Must **match** Vercel exactly |
+| `WS_INTERNAL_SECRET` | ✓ | Must **match** Vercel exactly |
+| `NEXT_APP_URL` | ✓ | `https://collab-one-phi.vercel.app` |
+| `HOST` | — | `0.0.0.0` (default) |
+| `PORT` | — | Injected by Render — do not hardcode |
+
+---
+
+## Railway
+
+### 1. Create the Railway service
 
 1. Open [Railway](https://railway.app) → **New Project** → **Deploy from GitHub repo**.
 2. Select this repository.

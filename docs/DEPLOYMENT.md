@@ -52,10 +52,15 @@ Railway injects `PORT` automatically; the server binds to `0.0.0.0`.
 ### Render
 
 1. New **Web Service** → connect repo.
-2. **Root Directory**: `backend`
-3. **Build Command**: `npm install && npm run build`
+2. **Root Directory**: `backend` (required).
+3. **Build Command**: `npm ci --include=dev && npm run build`  
+   (or `npm run render-build` from `backend/package.json`)
 4. **Start Command**: `npm start`
-5. Enable a health check on path `/` (expects `Collab WebSocket server`).
+5. Health check path `/` (expects `Collab WebSocket server`).
+
+If you see `Cannot find module '.../backend/dist/index.js'`, the build did not compile TypeScript — add `--include=dev` to the build command.
+
+See [backend/DEPLOYMENT.md](../backend/DEPLOYMENT.md) and [`render.yaml`](../render.yaml).
 
 ### WS server environment variables
 

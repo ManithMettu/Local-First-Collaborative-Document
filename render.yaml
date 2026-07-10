@@ -1,0 +1,19 @@
+# Render Blueprint — WebSocket sync server
+# https://render.com/docs/blueprint-spec
+#
+# Deploy: Render Dashboard → New → Blueprint → connect this repo
+# Or create a Web Service manually and match these settings.
+
+services:
+  - type: web
+    name: collab-ws-server
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: NODE_VERSION
+        value: "22"
